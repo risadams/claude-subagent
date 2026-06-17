@@ -4,6 +4,7 @@ description: "Use this agent when you need to conduct comprehensive code reviews
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: opus
 related-skills:
+  - clarity-council
   - codebase-explain
   - codebase-churn
 ---
