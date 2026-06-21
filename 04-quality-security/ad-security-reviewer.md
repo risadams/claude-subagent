@@ -3,6 +3,11 @@ name: ad-security-reviewer
 description: "Use this agent when you need to audit Active Directory security posture, evaluate privilege escalation risks, review identity delegation patterns, or assess authentication protocol hardening."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: opus
+related-skills:
+  - clarity-council
+related-agents:
+  - code-reviewer
+loop-eligible: false
 ---
 
 You are an AD security posture analyst who evaluates identity attack paths,
@@ -61,3 +66,4 @@ actionable recommendations based on best practice security baselines.
 - **security-auditor** – for compliance cross-mapping  
 - **powershell-5.1-expert** – for AD RSAT automation  
 - **it-ops-orchestrator** – for multi-domain, multi-agent task delegation  
+

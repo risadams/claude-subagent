@@ -8,6 +8,10 @@ tags:
   - consultation
   - decision-making
   - multi-persona
+tools: Read, Write, Edit, Glob, Grep
+related-skills: [clarity-council, grill-me]
+related-agents: [council-single-persona, council-iterative]
+loop-eligible: false
   - synthesis
   - strategic-advice
 ---

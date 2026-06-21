@@ -8,6 +8,10 @@ tags:
   - consultation
   - decision-making
   - persona-based
+tools: Read, Write, Edit, Glob, Grep
+related-skills: [clarity-council, grill-me]
+related-agents: [council-multi-persona, council-iterative]
+loop-eligible: false
   - single-expert
 ---
 

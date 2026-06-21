@@ -60,6 +60,7 @@ $ToolProfiles = @{
 $errors = @()
 $warnings = @()
 $validAgents = @()
+$allRelationships = @()  # Track all relationships for circular dependency detection
 
 function Add-Error {
     param([string]$message)
@@ -125,6 +126,52 @@ function Extract-Frontmatter {
     }
     
     return $null
+}
+
+function Test-LoopMethodFields {
+    param(
+        [string]$filePath,
+        [string]$filename,
+        [string]$category,
+        [hashtable]$fm,
+        [hashtable]$allAgentNames,
+        [hashtable]$allSkillNames
+    )
+
+    # Check related-skills if present
+    if ($fm['related-skills']) {
+        $skills = @($fm['related-skills'] -split ',\s*' | ForEach-Object { $_.Trim() })
+        foreach ($skill in $skills) {
+            if ($skill -and -not $allSkillNames.ContainsKey($skill)) {
+                Add-Warning "$category/$filename : related-skill '$skill' does not exist"
+            }
+        }
+    }
+
+    # Check related-agents if present
+    if ($fm['related-agents']) {
+        $agents = @($fm['related-agents'] -split ',\s*' | ForEach-Object { $_.Trim() })
+        foreach ($agent in $agents) {
+            if ($agent -and -not $allAgentNames.ContainsKey($agent)) {
+                Add-Warning "$category/$filename : related-agent '$agent' does not exist"
+            }
+            # Check for self-reference
+            if ($agent -eq $fm['name']) {
+                Add-Error "$category/$filename : Self-reference in related-agents (cannot reference itself)"
+                return $false
+            }
+        }
+    }
+
+    # Check loop-eligible
+    if ($fm['loop-eligible'] -eq 'true') {
+        if (-not $category.StartsWith('09-')) {
+            Add-Error "$category/$filename : loop-eligible=true only allowed in 09-meta-orchestration"
+            return $false
+        }
+    }
+
+    return $true
 }
 
 function Validate-Agent {
@@ -222,7 +269,7 @@ function Validate-Agent {
     }
     
     Add-Success "$category/$filename : Valid"
-    
+
     return @{
         Category = $category
         Filename = $filename
@@ -230,7 +277,24 @@ function Validate-Agent {
         Description = $description
         Tools = $tools
         Model = $model
+        Frontmatter = $fm
     }
+}
+
+# Load skill names from skills directory for cross-validation
+function Get-AllSkillNames {
+    param([string]$rootPath)
+
+    $skillNames = @{}
+    $skillsPath = Join-Path (Split-Path $rootPath -Parent) "skills"
+
+    if (Test-Path $skillsPath -PathType Container) {
+        Get-ChildItem -Path $skillsPath -Directory | ForEach-Object {
+            $skillNames[$_.Name] = $true
+        }
+    }
+
+    return $skillNames
 }
 
 # Main validation logic
@@ -239,6 +303,7 @@ Write-Host ""
 
 $agentsByCategory = @{}
 $allAgentNames = @{}
+$allSkillNames = Get-AllSkillNames $AgentPath
 
 # Find all agent files
 foreach ($category in $ValidCategories) {
@@ -264,14 +329,21 @@ foreach ($category in $ValidCategories) {
         if ($previousFilename -and ($file.Name -lt $previousFilename)) {
             Add-Error "$category : Out of alphabetical order at $($file.Name) (comes after $previousFilename)"
         }
-        
+
         $agent = Validate-Agent -FilePath $file.FullName -Category $category -AllAgentNames $allAgentNames
         if ($agent) {
+            # Validate Loop Method fields
+            $loopValid = Test-LoopMethodFields -FilePath $file.FullName -Filename $file.Name -Category $category -Frontmatter $agent.Frontmatter -AllAgentNames $allAgentNames -AllSkillNames $allSkillNames
+            if (-not $loopValid) {
+                $previousFilename = $file.Name
+                continue
+            }
+
             $agentsByCategory[$category] += $agent
             $allAgentNames[$agent.Name] = "$category/$($agent.Filename)"
             $validAgents += $agent
         }
-        
+
         $previousFilename = $file.Name
     }
 }

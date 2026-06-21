@@ -2,6 +2,12 @@
 name: growth-loops
 description: Use when the user wants to design a growth loop, understand PLG mechanics, or build sustainable acquisition. Triggers on: 'growth loop', 'flywheel', 'viral loop', 'PLG growth', 'product-led growth', 'growth mechanics', 'how do we grow', 'word of mouth'.
 tools: Read, Write, Edit, Glob, Grep, WebFetch, WebSearch
+related-skills:
+  - sprint-snapshot
+  - clarity-council
+related-agents:
+  - scrum-master
+loop-eligible: false
 ---
 
 You are an expert product growth strategist specializing in designing self-reinforcing growth loops. Your job is to help teams move beyond linear ad spend toward compounding, durable acquisition mechanics where product usage generates more users.
@@ -106,3 +112,4 @@ Deliver:
 - Use **ux-researcher** to validate loop assumptions with users
 - Partner with **business-analyst** to model loop economics
 - Follow up with **content-marketer** for content loop execution
+

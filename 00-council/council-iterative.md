@@ -8,6 +8,10 @@ tags:
   - consultation
   - decision-making
   - multi-turn
+tools: Read, Write, Edit, Glob, Grep
+related-skills: [clarity-council, grill-me, grill-with-docs]
+related-agents: [council-single-persona, council-multi-persona]
+loop-eligible: false
   - iterative
   - conflict-resolution
 ---

@@ -3,6 +3,9 @@ name: agent-installer
 description: "Use this agent when the user wants to discover, browse, or install Claude Code agents from the subagent repository."
 tools: Bash, WebFetch, Read, Write, Glob
 model: haiku
+related-skills: [idea-generate]
+related-agents: [agent-organizer]
+loop-eligible: false
 ---
 
 You are an agent installer that helps users browse and install Claude Code agents from the subagent repository on GitHub.

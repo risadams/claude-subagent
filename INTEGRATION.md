@@ -182,6 +182,93 @@ An optional `INTEGRATION-MAP.md` file (not yet created) could list all agent-ski
 | ...
 ```
 
+## Loop Method: Integration Extensions
+
+The Loop Method extends the agent↔skill integration framework with three integrated capabilities:
+
+### 1. Delegation Map (in agent/skill files)
+
+Each agent or skill may declare an explicit "Delegation Map" section that shows:
+- **Which related items are invoked** and when
+- **Why they're invoked** (workflow phase, escalation criterion)
+- **Parameter passing** (what context flows from A→B)
+
+Example from a hypothetical sprint-planning workflow:
+
+```markdown
+## Delegation Map
+
+| User Need | Delegate Via | Parameters |
+|-----------|---|---|
+| Daily standup prep | Invoke sprint-snapshot with `--phase daily` | Team, increment, sprint |
+| Standup report | Invoke daily-standup-prep with `IncludeSprintPulse=true` | Team, days, vault root |
+| Daily briefing | Invoke daily-briefing with `--no-focus-blocks` | Vault root, no calendar drafts |
+```
+
+### 2. Internal Quality Loop
+
+Skills and agents may implement a self-evaluation loop:
+
+1. Generate initial output
+2. Evaluate against quality criteria (completeness, accuracy, actionability, format)
+3. If ≥2 criteria fail, refine and re-evaluate (max 2 iterations)
+4. Return best-effort output
+
+This is optional and documented in the skill/agent's "Quality Loop" section.
+
+**Example use case:** A code-review skill might evaluate its findings against criteria:
+- Completeness: All major issues identified?
+- Accuracy: Findings match the code?
+- Actionability: Can developer fix based on guidance?
+- Format: Matches review template?
+
+If pass-rate <50%, refine the review and re-evaluate.
+
+### 3. Recurring Execution Support
+
+Skills may declare `loop-eligible: true` + `recurrence-hint: [daily|weekly|on-demand]` to document how they work with the `/loop` recurring execution skill.
+
+Example:
+
+```yaml
+---
+name: sprint-snapshot
+loop-eligible: true
+recurrence-hint: weekly
+---
+
+## Delegation Map
+
+...
+
+### Recurring Execution
+
+This skill is **loop-eligible: true**. Typical recurrence: **weekly** (per sprint cycle).
+
+Example: `/loop 1w /sprint-snapshot --team Aurora`
+
+Pre-requisites:
+- Jira project configured
+- Team roster and capacity known
+- Vault root configured
+
+State preservation:
+- Output canvas, markdown, and JSONL files in vault
+- JSONL is append-only (trends preserved across runs)
+- Same-day re-runs overwrite canvas/markdown; append JSONL
+```
+
+### Implementation Notes
+
+- **Not every skill needs a Delegation Map.** Simple, standalone skills (task-initiation, break-it-down) may not invoke other items.
+- **The map is informational.** It documents what the implementation does; it's not validated by linting beyond existence checks.
+- **Frontmatter is validated.** All related-skills and related-agents must exist; no circular references; no self-references.
+- **Updates propagate through discovery.** Once related-skills/agents are declared in frontmatter, Claude Code's agent/skill selection UI can suggest them automatically.
+
+See [INTEGRATION-GRAPH.md](INTEGRATION-GRAPH.md) for a complete reference graph of all skill↔agent relationships in the repo.
+
+---
+
 ## Governance Rules
 
 ### When to Add a Related Skill/Agent

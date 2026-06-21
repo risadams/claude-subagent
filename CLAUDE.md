@@ -81,6 +81,31 @@ You are a [role description]...
 | `tools` | ✓ | List | Comma-separated valid tools; must match one of the tool profiles (see ADR-0003) |
 | `model` | ✗ | Enum | `haiku`, `sonnet`, or `opus`; defaults to `sonnet` |
 
+### Frontmatter Extensions: Loop Method (ADR-0005)
+
+The Loop Method adds three new optional frontmatter fields to enable:
+1. **Skill Integration:** Declare which skills this agent invokes or recommends
+2. **Agent Composition:** Declare collaboration with other agents
+3. **Self-Improvement:** Support for iterative quality loops
+
+#### New Fields
+
+| Field | Required | Type | Rules | Example |
+|-------|----------|------|-------|---------|
+| `related-skills` | No | Array[string] | Comma-separated skill names; must exist; 0-5 typical | `related-skills: [code-review, codebase-explain]` |
+| `related-agents` | No | Array[string] | Comma-separated agent names; must exist; 0-3 typical | `related-agents: [backend-developer, database-architect]` |
+| `loop-eligible` | No | Boolean | Default: `false`. Only `true` for orchestration agents (09-*) | `loop-eligible: false` |
+
+#### Validation Rules
+
+- **Existence check:** Both `related-skills` and `related-agents` values must correspond to actual files in the repo
+- **No self-reference:** An agent cannot list itself in `related-agents` or `related-skills`
+- **No circular chains:** Linting detects and rejects A→B→A patterns
+- **Cardinality bounds:** >6 related items require ADR justification
+- **Type correctness:** `related-skills` must be skill names; `related-agents` must be agent names
+
+See [INTEGRATION.md](INTEGRATION.md) for delegation patterns and [INTEGRATION-GRAPH.md](INTEGRATION-GRAPH.md) for the complete reference graph.
+
 ### Valid Tool Permissions (ADR-0003)
 
 Agents must use one of these standard tool profiles:
@@ -128,6 +153,22 @@ The script validates:
 - ✓ Valid tool permissions against profiles
 - ✓ Description clarity & length
 
+### Loop Method Validation
+
+The linting script validates Loop Method fields (ADR-0005):
+
+```powershell
+.\scripts\lint-agents.ps1 -Verbose
+```
+
+Checks:
+- ✓ `related-skills` values are valid skill names (exist in skills/)
+- ✓ `related-agents` values are valid agent names (exist in agents/)
+- ✓ No circular reference chains (A→B→C→A rejected)
+- ✓ No self-references
+- ✓ If `loop-eligible: true`, agent is in 09-meta-orchestration
+- ✓ Cardinality warnings if >6 related items
+
 ### CI/CD Validation
 
 GitHub Actions runs linting on every PR and push:
@@ -163,9 +204,11 @@ Get-ChildItem -Path . -Filter "*.md" -Recurse | Select-String -Pattern "^name:" 
 
 1. Create `XX-category/agent-name.md` (replace XX and agent-name)
 2. Add YAML frontmatter with all required fields
-3. Write agent description (1-2 paragraphs)
-4. Add "Communication Protocol" section (how to invoke, what responses to expect)
-5. Add "Development Workflow" section (implementation approach)
+3. **Loop Method (optional):** Add `related-skills`, `related-agents`, and `loop-eligible` fields if this agent invokes skills or collaborates with other agents
+4. Write agent description (1-2 paragraphs)
+5. Add "Communication Protocol" section (how to invoke, what responses to expect)
+6. Add "Development Workflow" section (implementation approach)
+7. **Loop Method (optional):** Add "Delegation & Skill Integration" section to document which skills/agents are invoked and why
 
 ### Step 4: Update Category README
 

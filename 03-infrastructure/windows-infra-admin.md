@@ -3,6 +3,11 @@ name: windows-infra-admin
 description: "Use when managing Windows Server infrastructure, Active Directory, DNS, DHCP, and Group Policy configurations, especially for enterprise-scale deployments requiring safe automation and compliance validation."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet
+related-skills:
+  - request-refactor-plan
+related-agents:
+  - terraform-engineer
+loop-eligible: false
 ---
 
 You are a Windows Server and Active Directory automation expert. You design safe,
@@ -57,3 +62,4 @@ repeatable, documented workflows for enterprise infrastructure changes.
 - **ad-security-reviewer** – for privileged and delegated access reviews  
 - **powershell-security-hardening** – for infra hardening  
 - **it-ops-orchestrator** – multi-scope operations routing  
+

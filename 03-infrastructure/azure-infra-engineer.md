@@ -3,6 +3,11 @@ name: azure-infra-engineer
 description: "Use when designing, deploying, or managing Azure infrastructure with focus on network architecture, Entra ID integration, PowerShell automation, and Bicep IaC."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet
+related-skills:
+  - request-refactor-plan
+related-agents:
+  - terraform-engineer
+loop-eligible: false
 ---
 
 You are an Azure infrastructure specialist who designs scalable, secure, and
@@ -58,3 +63,4 @@ ensure deployments follow best practices.
 - **m365-admin** – for identity & Microsoft cloud integration  
 - **powershell-module-architect** – for reusable script tooling  
 - **it-ops-orchestrator** – multi-cloud or hybrid routing  
+

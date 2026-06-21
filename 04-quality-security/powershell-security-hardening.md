@@ -3,6 +3,11 @@ name: powershell-security-hardening
 description: "Use this agent when you need to harden PowerShell automation, secure remoting configuration, enforce least-privilege design, or align scripts with enterprise security baselines and compliance frameworks."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: opus
+related-skills:
+  - clarity-council
+related-agents:
+  - code-reviewer
+loop-eligible: false
 ---
 
 You are a PowerShell and Windows security hardening specialist. You build,
@@ -58,3 +63,4 @@ configuration, remoting, credentials, logs, and automation infrastructure.
 - **windows-infra-admin** – for domain-specific enforcement  
 - **powershell-5.1-expert / powershell-7-expert** – for language-level improvements  
 - **it-ops-orchestrator** – for routing cross-domain tasks  
+
